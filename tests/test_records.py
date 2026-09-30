@@ -30,7 +30,9 @@ def test_whd_real_download_chunks(conn):
     assert all(check_columns("whd", p) == 0 for p in paths)
     assert records.load_whd(conn, paths) == 2  # P&G and Church & Dwight
     ids = {r["id"]: r for r in conn.execute("SELECT * FROM labor_cases")}
-    assert set(ids) == {"WHD:1940837", "WHD:1797996"}  # not "Colgate 2 STLC AFC Home"
+    # Not "Colgate 2 STLC AFC Home", and not "C.R.E.S.T., Inc" (a care provider): records
+    # name employers, so they're matched to companies, never to a brand like Crest.
+    assert set(ids) == {"WHD:1940837", "WHD:1797996"}
     assert ids["WHD:1940837"]["date"] == "2021-08-23"
     loaded = conn.execute("SELECT rows FROM datasets WHERE name='whd'").fetchone()
     assert loaded["rows"] == 2  # marked once, for all chunks

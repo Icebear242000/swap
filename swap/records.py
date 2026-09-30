@@ -15,7 +15,10 @@ from swap.sources import dol, openfda
 
 
 def org_keys(conn: sqlite3.Connection) -> list[str]:
-    return [r["key"] for r in conn.execute("SELECT key FROM orgs")]
+    # Government records name legal entities (employers, recalling firms), not brands.
+    # Brand names are often ordinary words: "C.R.E.S.T., Inc" is a care provider, not
+    # Crest. A brand still sees its parent company's records through the ownership chain.
+    return [r["key"] for r in conn.execute("SELECT key FROM orgs WHERE kind='company'")]
 
 
 def save_alias(conn: sqlite3.Connection, raw_name: str, match: Match) -> str:
