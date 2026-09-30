@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Search not supported: recalling_firm:&quot;Nestlé&quot; AND product_type:drugs"
+  }
+}

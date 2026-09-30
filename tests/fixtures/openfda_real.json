@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-09-23",
+    "results": {
+      "skip": 0,
+      "limit": 2,
+      "total": 2
+    }
+  },
+  "results": [
+    {
+      "status": "Terminated",
+      "city": "New York",
+      "state": "NY",
+      "country": "United States",
+      "classification": "Class III",
+      "openfda": {
+        "brand_name": [
+          "PREVIDENT"
+        ],
+        "generic_name": [
+          "SODIUM FLUORIDE"
+        ],
+        "manufacturer_name": [
+          "Colgate Oral Pharmaceuticals, Inc."
+        ],
+        "product_ndc": [
+          "0126-0016"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "DENTAL"
+        ],
+        "substance_name": [
+          "SODIUM FLUORIDE"
+        ],
+        "rxcui": [
+          "392038",
+          "630194"
+        ],
+        "spl_id": [
+          "8f71eedc-1ece-48c0-9130-48ca61d872fc"
+        ],
+        "spl_set_id": [
+          "d93ee76f-454b-40bf-9357-39a2ae3b6ccb"
+        ],
+        "package_ndc": [
+          "0126-0016-61",
+          "3834110622"
+        ],
+        "is_original_packager": [
+          true
+        ],
+        "upc": [
+          "0301260016610"
+        ],
+        "unii": [
+          "8ZYQ1474W7"
+        ]
+      },
+      "product_type": "Drugs",
+      "event_id": "76516",
+      "recalling_firm": "Colgate Palmolive Co",
+      "address_1": "300 Park Ave",
+      "address_2": "Attn: Anthony Cavaliere",
+      "postal_code": "10022-7402",
+      "voluntary_mandated": "Voluntary: Firm initiated",
+      "initial_firm_notification": "Letter",
+      "distribution_pattern": "Nationwide",
+      "recall_number": "D-0521-2017",
+      "product_description": "PreviDent 5000 ppm, DRY MOUTH, 1.1% Sodium Fluoride, PRESCRIPTION STRENGTH TOOTHPASTE, SLS Free Formula, SOOTHING MINT, 3.4 FL OZ (100 mL), Colgate Oral Pharmaceuticals, Inc., New York, NY 10022 --- NDC 0126-0016-61, UPC 3834110622",
+      "product_quantity": "14,656 bottles",
+      "reason_for_recall": "Label Mix up; rear panel is incorrectly labeled with the PreviDent 5000 Enamel Protect rear panel.",
+      "recall_initiation_date": "20170213",
+      "center_classification_date": "20170315",
+      "termination_date": "20170613",
+      "report_date": "20170322",
+      "code_info": "Lots:  6350US561G, 6350US562G, 6351US561G, 6351US562G"
+    },
+    {
+      "status": "Terminated",
+      "city": "Piscataway",
+      "state": "NJ",
+      "country": "United States",
+      "classification": "Class II",
+      "openfda": {},
+      "product_type": "Drugs",
+      "event_id": "92835",
+      "recalling_firm": "Colgate Palmolive Company",
+      "address_1": "909 River Rd",
+      "address_2": "",
+      "postal_code": "08854-5503",
+      "voluntary_mandated": "Voluntary: Firm initiated",
+      "initial_firm_notification": "Letter",
+      "distribution_pattern": "Nationwide in the USSA",
+      "recall_number": "D-1084-2023",
+      "product_description": "hello wild strawberry fluoride toothpaste, sodium fluoride 0.24% (0.15% w/v fluoride ion), NET WT 4.2 OZ (119 g), Distributed by Hello Products LLC, Montclair, NJ 07042, UPC 8 19156 02026 4 (carton), 12-count case GTIN: 20819156020268; strawberry tubes also sold in Strawberry 3-pack overwrap UPC 8 19156 02349 4, UPC 10819156023491 case; in the variety 3-pack of Strawberry + Unicorn + Grape UPC 8 19156 02332 6, UPC 10819156023323 case; and in a 24-count Toothpaste Floorstand, UPC 819156020684 (case).",
+      "product_quantity": "182,046 tubes",
+      "reason_for_recall": "Labeling: Label Mix-Up: Some hello wild strawberry fluoride toothpaste, packaged in cartons labeled as hello wild strawberry fluoride toothpaste were incorrectly filled in tubes labeled as hello fresh watermelon fluoride free toothpaste.",
+      "recall_initiation_date": "20230810",
+      "center_classification_date": "20230814",
+      "termination_date": "20240401",
+      "report_date": "20230823",
+      "code_info": "Lot #: 004287, 2267USA94A, 2271USA94A, EXP 08/2024; 3053USA94A, Exp 01/2025; 3156USA94A, 3157USA94A, EXP 05/2025",
+      "more_code_info": ""
+    }
+  ]
+}

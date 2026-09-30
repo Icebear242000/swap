@@ -6,6 +6,7 @@ API docs: https://open.fda.gov/apis/drug/enforcement/
 
 from __future__ import annotations
 
+import unicodedata
 from typing import Any
 
 import httpx
@@ -35,7 +36,9 @@ def parse_result(r: dict[str, Any]) -> dict[str, Any] | None:
 
 def fetch_firm_recalls(client: httpx.Client, firm: str, limit: int = 100) -> list[dict[str, Any]]:
     # openFDA answers 404 when nothing matches; get_json turns that into None.
-    term = firm.replace('"', "")
+    # It rejects non-ASCII searches with a 400, and its firm names are ASCII anyway.
+    term = unicodedata.normalize("NFKD", firm).encode("ascii", "ignore").decode()
+    term = term.replace('"', "")
     data = get_json(client, ENDPOINT, {"search": f'recalling_firm:"{term}"', "limit": limit})
     if not data:
         return []
