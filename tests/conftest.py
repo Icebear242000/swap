@@ -12,7 +12,7 @@ FIX = Path(__file__).parent / "fixtures"
 
 
 def fixture_json(name: str):
-    return json.loads((FIX / name).read_text())
+    return json.loads((FIX / name).read_text(encoding="utf-8"))
 
 
 def router(request: httpx.Request) -> httpx.Response:

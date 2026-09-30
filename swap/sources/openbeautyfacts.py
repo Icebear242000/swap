@@ -5,6 +5,7 @@ API docs: https://openfoodfacts.github.io/openfoodfacts-server/api/
 
 from __future__ import annotations
 
+import html
 from typing import Any
 
 import httpx
@@ -46,6 +47,12 @@ def to_category(tags: list[str] | None) -> str | None:
     return None
 
 
+def _text(value: Any) -> str:
+    # Some text fields come back HTML-escaped ("&gt;", "&quot;"). Decode once here so the
+    # database, ingredient rules and UI all see plain text; the UI escapes on output.
+    return html.unescape(value).strip() if isinstance(value, str) else ""
+
+
 def first_brand(brands: str | None) -> str | None:
     if not brands:
         return None
@@ -56,18 +63,20 @@ def first_brand(brands: str | None) -> str | None:
 def parse_product(raw: dict[str, Any]) -> dict[str, Any] | None:
     """Turn an Open Beauty Facts product into our row shape, or None if unusable."""
     code = str(raw.get("code") or "").strip()
-    name = (raw.get("product_name_en") or raw.get("product_name") or "").strip()
+    name = _text(raw.get("product_name_en") or raw.get("product_name"))
     if not code or not name:
         return None
     qty = raw.get("quantity")
     parsed = parse_ounces(qty)
+    brands = _text(raw.get("brands"))
     return {
         "barcode": code,
         "name": name,
-        "brand": first_brand(raw.get("brands")),
-        "brands_all": [b.strip() for b in (raw.get("brands") or "").split(",") if b.strip()],
+        "brand": first_brand(brands),
+        "brands_all": [b.strip() for b in brands.split(",") if b.strip()],
         "category": to_category(raw.get("categories_tags")),
-        "ingredients_text": (raw.get("ingredients_text_en") or raw.get("ingredients_text") or None),
+        "ingredients_text": _text(raw.get("ingredients_text_en") or raw.get("ingredients_text"))
+        or None,
         "quantity_text": qty,
         "quantity_oz": parsed[0] if parsed else None,
         "quantity_unit": parsed[1] if parsed else None,
