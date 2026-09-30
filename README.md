@@ -78,16 +78,31 @@ swap load-products --pages 10      # toothpastes from Open Beauty Facts
 swap load-ownership                # resolve brand owners on Wikidata
 swap load-recalls                  # openFDA drug enforcement reports for tracked companies
 
-# DOL bulk files: https://enforcedata.dol.gov/views/data_summary.php
-swap check-columns whd raw/whd_whisard.csv
-swap load-whd raw/whd_whisard.csv
+# Wage and Hour: https://data.dol.gov/datasets/10362 -> "Download Complete Dataset"
+# (WHD_enforcement.zip, ~200 MB, a set of CSV chunks). Unzip into raw/whd/, then:
+swap check-columns whd raw/whd/<any chunk>.csv
+swap load-whd raw/whd/*.csv        # load every chunk in one run
+
 swap check-columns osha-inspection raw/osha_inspection.csv
 swap load-osha raw/osha_inspection.csv raw/osha_violation.csv
 ```
 
-The DOL loaders stream multi-gigabyte files and keep only rows matching a tracked company, so the
+The DOL loaders stream large files and keep only rows matching a tracked company, so the
 database stays small. If DOL renames a column, `check-columns` says which, and the mapping lives
-in one place (`swap/sources/dol.py`).
+in one place (`swap/sources/dol.py`). Column names are compared case-insensitively, since DOL's
+field docs are lowercase but the WHD download is uppercase. `load-whd` takes all chunks at once so
+the dataset is only marked loaded when it's complete; otherwise a partial load could report "no
+cases" for a company whose cases are in a chunk that wasn't loaded.
+
+Government records are matched only against **companies**, never brands: they name employers
+and recalling firms, and brand names are often ordinary words ("C.R.E.S.T., Inc" is a care
+provider, not Crest). A brand still sees its parent company's records. Likewise, a brand name
+that matches more than one Wikidata item (e.g. "Signal" is also a record label) is skipped
+rather than guessed, and a Wikidata brand with no listed owner counts as unknown, not
+independent.
+
+**Follow-up: OSHA.** The OSHA loader is tested against recorded fixtures but hasn't been run on
+the real downloads yet (several GB). Until it is, the worker checkpoint uses WHD only and says so.
 
 Set `SWAP_SEED_DEMO=0` to start without sample data, and `SWAP_LIVE_LOOKUPS=0` to run fully
 offline.
@@ -112,6 +127,9 @@ pytest -q && ruff check .
 Tests run offline against recorded fixtures of each outside API, covering name matching,
 ingredient rules (fluoride is never flagged as PFAS), multi-level ownership with cycles, OSHA
 severity and deleted citations, the "dataset not loaded" rule, gating, ranking and the HTTP API.
+Fixtures ending in `_real` are recorded from the live services and cover quirks found there:
+HTML-escaped text from Open Beauty Facts, ambiguous Wikidata labels, openFDA rejecting non-ASCII
+searches, and the WHD download's uppercase headers, timestamp dates and chunked files.
 
 ## Limits
 
