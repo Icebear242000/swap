@@ -17,7 +17,7 @@ class Settings:
     # Open Food Facts projects ask every client to identify itself.
     user_agent: str = field(
         default_factory=lambda: os.environ.get(
-            "SWAP_USER_AGENT", "Swap/0.1 (https://github.com/your-username/swap)"
+            "SWAP_USER_AGENT", "Swap/0.1 (https://github.com/Icebear242000/swap)"
         )
     )
     # Seed fictional sample products into an empty database so a fresh deploy is usable.
