@@ -1,7 +1,10 @@
-"""The four checkpoints, plus the recall warning.
+"""The checkpoints, plus the recall warning.
 
 Each checkpoint returns pass / fail / unknown with the evidence behind it.
 Missing data is always "unknown", never an automatic pass.
+
+Checkpoints judge what a product and its company do, not who owns them. Ownership
+is still used to find a brand's parent company, whose records apply to the brand.
 """
 
 from __future__ import annotations
@@ -34,9 +37,6 @@ CHECKPOINTS: tuple[CheckpointDef, ...] = (
         "fights_cavities", "Fights cavities", "Does it contain fluoride?", ("toothpaste",)
     ),
     CheckpointDef("ingredients", "Ingredients", "Free of PFAS and restricted ingredients?", None),
-    CheckpointDef(
-        "independent", "Independent brand", "Not owned by a larger parent company?", None
-    ),
     CheckpointDef(
         "workers",
         "Treats workers well",
@@ -115,33 +115,6 @@ def check_ingredients(f: ing.IngredientFindings) -> Result:
     if cautions:
         return _result(cid, PASS, f"No PFAS. Note: contains {cautions[0][1]}.", ev)
     return _result(cid, PASS, "No PFAS or restricted ingredients found.")
-
-
-def check_independent(own: Ownership) -> Result:
-    cid = "independent"
-    if not own.known:
-        return _result(cid, UNKNOWN, "This brand isn't in our ownership records yet.")
-    if own.has_parent:
-        top = own.ultimate
-        ev = [
-            Evidence(f"{a.name} is owned by {b.name}.", b.source, b.source_url)
-            for a, b in zip(own.chain, own.chain[1:], strict=False)
-        ]
-        return _result(cid, FAIL, f"Owned by {top.name}.", ev)
-    if own.chain[0].source == "wikidata":
-        # Wikidata is volunteer-edited; a missing "owned by" usually means nobody added it.
-        return _result(
-            cid,
-            UNKNOWN,
-            "No parent company listed on Wikidata, which doesn't confirm it's independent.",
-            [Evidence(f"{own.chain[0].name} has no owner listed.", "wikidata")],
-        )
-    return _result(
-        cid,
-        PASS,
-        "No parent company on record.",
-        [Evidence(f"{own.chain[0].name} has no owner in our records.", own.chain[0].source)],
-    )
 
 
 def check_workers(conn: sqlite3.Connection, own: Ownership, s: Settings) -> Result:
@@ -250,8 +223,6 @@ def evaluate(
             out.append(check_fights_cavities(findings))
         elif c.id == "ingredients":
             out.append(check_ingredients(findings))
-        elif c.id == "independent":
-            out.append(check_independent(own))
         elif c.id == "workers":
             out.append(check_workers(conn, own, s))
     return out

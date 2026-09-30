@@ -2,13 +2,11 @@ import httpx
 from conftest import fixture_json
 
 from swap import ownership
-from swap.checkpoints import FAIL, PASS, UNKNOWN, check_independent
 
 
 def test_override_chain(conn):
     own = ownership.chain_for(conn, ownership.resolve_brand_key(conn, ["Tom's of Maine"]))
     assert [link.name for link in own.chain] == ["Tom's of Maine", "Colgate-Palmolive"]
-    assert check_independent(own).status == FAIL
 
 
 def test_siblings(conn):
@@ -18,25 +16,13 @@ def test_siblings(conn):
 
 def test_unknown_brand(conn):
     own = ownership.chain_for(conn, ownership.resolve_brand_key(conn, ["Nobody Brand"]))
-    assert not own.known and check_independent(own).status == UNKNOWN
-
-
-def test_checked_brand_with_no_parent_is_independent(conn):
-    ownership.upsert_org(conn, "Tiny Paste", "brand", "override")
-    own = ownership.chain_for(conn, "tiny paste")
-    assert check_independent(own).status == PASS
-
-
-def test_wikidata_with_no_parent_is_unknown(conn):
-    # A missing edge in volunteer data is not evidence of independence.
-    ownership.upsert_org(conn, "Tiny Paste", "brand", "wikidata", "Q1")
-    own = ownership.chain_for(conn, "tiny paste")
-    assert check_independent(own).status == UNKNOWN
+    assert not own.known
 
 
 def test_ambiguous_wikidata_label_is_skipped(conn):
     # Recorded from the live API: "Signal" matches a record label, the toothpaste brand
-    # and a third item. Picking one would be a guess, so the brand stays unknown.
+    # and a third item. Picking one would be a guess (and would attach the wrong company's
+    # records), so the brand stays unknown.
     real = fixture_json("wikidata_labels_real.json")
     transport = httpx.MockTransport(lambda request: httpx.Response(200, json=real))
     with httpx.Client(transport=transport) as client:

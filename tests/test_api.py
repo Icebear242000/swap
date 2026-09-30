@@ -20,14 +20,16 @@ def test_demo_product_report(settings, client):
     with make(settings, client) as t:
         r = t.get("/api/products/2000000000060").json()  # Brightmore
         status = {c["id"]: c["status"] for c in r["checkpoints"]}
-        assert status == {
-            "fights_cavities": "pass",
-            "ingredients": "pass",
-            "independent": "fail",
-            "workers": "fail",
-        }
+        assert status == {"fights_cavities": "pass", "ingredients": "pass", "workers": "fail"}
+        # Ownership is still shown, as information rather than a checkpoint.
         assert r["ownership"]["siblings"] == ["Lumen"]
         assert r["price"]["per_oz"] == round(2.99 / 6.0, 2)
+
+
+def test_checkpoints_judge_conduct_not_ownership(settings, client):
+    with make(settings, client) as t:
+        ids = [c["id"] for c in t.get("/api/checkpoints").json()["checkpoints"]]
+        assert ids == ["fights_cavities", "ingredients", "workers"]
 
 
 def test_recall_banner(settings, client):
@@ -58,8 +60,9 @@ def test_alternatives_gate_and_rank(settings, client):
         shown = [a["product"]["name"] for a in r["shown"]]
         hidden = {h["product"]["name"]: h["reasons"] for h in r["hidden"]}
         assert "Plainfield Baking Soda Paste" in hidden  # no fluoride, required
-        assert "Lumen Glide Whitening" in hidden  # PTFE, and same owner
-        assert any("same company" in x for x in hidden["Lumen Glide Whitening"])
+        assert "Lumen Glide Whitening" in hidden  # PTFE
+        # Same owner isn't a reason to hide by default; that's an opt-in filter.
+        assert not any("same company" in x for x in hidden["Lumen Glide Whitening"])
         # Three score equally; the recalled one drops, then cheaper per ounce wins.
         assert shown[:3] == [
             "Tidewell Fresh Mint Toothpaste",
@@ -75,12 +78,15 @@ def test_preferences_change_results(settings, client):
     with make(settings, client) as t:
         r = t.get(
             "/api/products/2000000000060/alternatives",
-            params={"required": "fights_cavities,ingredients,independent,workers"},
+            params={"required": "fights_cavities,ingredients,workers"},
         ).json()
         names = [a["product"]["name"] for a in r["shown"]]
-        assert "Sprigg Kids Berry" in names  # unknown ownership isn't a failure
-        r2 = t.get(
-            "/api/products/2000000000060/alternatives",
-            params={"required": "", "same_owner": "true"},
-        ).json()
+        assert "Sprigg Kids Berry" in names  # unknown worker records aren't a failure
+        r2 = t.get("/api/products/2000000000060/alternatives", params={"required": ""}).json()
         assert "Lumen Glide Whitening" in [a["product"]["name"] for a in r2["shown"]]
+        r3 = t.get(
+            "/api/products/2000000000060/alternatives",
+            params={"required": "", "hide_same_owner": "true"},
+        ).json()
+        hidden = {h["product"]["name"]: h["reasons"] for h in r3["hidden"]}
+        assert any("same company" in x for x in hidden["Lumen Glide Whitening"])

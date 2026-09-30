@@ -1,13 +1,14 @@
 # Swap
 
-**Scan a toothpaste. See who really owns it, what the public record says about them, and which
-alternatives pass the checkpoints you care about.**
+**Scan a toothpaste. See whether it does what it promises, what's in it, and what the public
+record says about the company that makes it, then find alternatives that do better on what you
+care about.**
 
-"Natural" and "indie" brands are often owned by the same conglomerates as the products they
-replace: Tom's of Maine and hello both belong to Colgate-Palmolive. Swap traces a brand to its
-ultimate parent company, checks that company against government enforcement records, and ranks
-alternatives by your own priorities. Every verdict links to the record behind it, and missing
-data shows as "unknown", never as a pass.
+The name on the label often isn't the company behind it: Tom's of Maine and hello both belong to
+Colgate-Palmolive. Swap traces a brand to its parent company, checks that company against
+government enforcement records, and ranks alternatives by your own priorities. It judges
+companies on what the records show they've done, not on their size or who owns them. Every
+verdict links to the record behind it, and missing data shows as "unknown", never as a pass.
 
 | Scan result | Better swaps | Your checkpoints |
 |---|---|---|
@@ -19,14 +20,15 @@ data shows as "unknown", never as a pass.
 |---|---|---|
 | Fights cavities | Does it contain fluoride? (toothpaste only) | Ingredient list, Open Beauty Facts |
 | Ingredients | Free of PFAS and restricted ingredients? | Ingredient list + rule files in `swap/rules/` |
-| Independent brand | Not owned by a larger parent company? | Wikidata ownership graph + checked overrides |
-| Treats workers well | No serious labor violations in the last 5 years? | OSHA inspections, DOL Wage and Hour cases |
+| Treats workers well | No serious labor violations in the last 5 years? | OSHA inspections, DOL Wage and Hour cases, via the parent company |
 
 Plus a **recall warning** from openFDA enforcement reports and **price per ounce** from Open Prices.
+Each product also shows **who owns it** (Wikidata ownership graph + checked overrides), as
+information: ownership is how a brand is linked to its parent company's records, not a verdict.
 
 You mark checkpoints as *required* (a failure hides the product) and set each one's
-*importance* (which orders what's left). Alternatives owned by the same parent as your product
-are hidden by default, since switching to them keeps your money with the same company.
+*importance* (which orders what's left). If you'd rather move your money away from a company,
+you can also hide alternatives made by the same parent company as your product.
 
 ## How it works
 
@@ -98,8 +100,7 @@ Government records are matched only against **companies**, never brands: they na
 and recalling firms, and brand names are often ordinary words ("C.R.E.S.T., Inc" is a care
 provider, not Crest). A brand still sees its parent company's records. Likewise, a brand name
 that matches more than one Wikidata item (e.g. "Signal" is also a record label) is skipped
-rather than guessed, and a Wikidata brand with no listed owner counts as unknown, not
-independent.
+rather than guessed, since the wrong owner would bring the wrong company's records with it.
 
 **Follow-up: OSHA.** The OSHA loader is tested against recorded fixtures but hasn't been run on
 the real downloads yet (several GB). Until it is, the worker checkpoint uses WHD only and says so.
@@ -140,6 +141,9 @@ searches, and the WHD download's uppercase headers, timestamp dates and chunked 
 - Wikidata ownership is volunteer-edited. Checked facts in `rules/ownership_overrides.csv` take
   priority, and each link shows its source.
 - Open Beauty Facts coverage is uneven. Missing products get a clear "we don't have this yet".
+- Planned: an environment checkpoint from EPA enforcement records (Clean Air and Clean Water Act
+  cases), and supply-chain forced labor from official lists (UFLPA Entity List, CBP Withhold
+  Release Orders). Allegations without an official record won't produce a verdict.
 
 ## Data sources and licenses
 

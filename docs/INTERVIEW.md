@@ -17,7 +17,9 @@ Know these well enough to explain without notes.
 6. **Resilience.** Every outside call has a timeout and retries and degrades to "unknown".
 7. **What I'd do next.** More categories; OCR of ingredient labels for products missing from
    Open Beauty Facts; a scheduled job to refresh records; Postgres if multiple writers appear;
-   run the OSHA loader on the real multi-GB files; a reviewed list of manual aliases.
+   run the OSHA loader on the real multi-GB files; a reviewed list of manual aliases; an
+   environment checkpoint from EPA enforcement records; supply-chain forced labor from official
+   lists (UFLPA Entity List, CBP Withhold Release Orders).
 
 ## What testing against real data found
 
@@ -35,10 +37,10 @@ response (fixtures ending in `_real`), written so it failed before the fix.
    $69k in back wages, into Crest, and so into Procter & Gamble; three unrelated "AIM"
    companies matched too. Records now match companies only; a brand still sees its parent's
    records through the ownership chain. WHD matches went from 17 to 10, all correct.
-10. **A missing edge in volunteer data is not evidence.** "Signal" matched three Wikidata items,
-    and the first was a record label with no owner, so Signal, a Unilever toothpaste, showed as
-    independent. Now a name matching several items is skipped, and a Wikidata brand with no
-    listed owner is "unknown". PASS needs a checked fact.
+10. **Don't guess an entity from a name.** "Signal" matched three Wikidata items, and the first
+    was a record label. Picking one would attach the wrong company to a Unilever toothpaste,
+    and with it the wrong company's records. Now a name matching several items is skipped and
+    stays "unknown".
 11. **A partial load must not look complete.** Marking the WHD dataset loaded per chunk would let
     a company whose cases sit in an unloaded chunk read "no cases". `load-whd` takes every chunk
     and marks the dataset once.
@@ -47,3 +49,10 @@ response (fixtures ending in `_real`), written so it failed before the fix.
     "unknown". A miss is honest; a false match accuses a company of something it didn't do. The
     fix for misses is a reviewed manual alias list (the `aliases` table already supports it), not
     looser matching.
+13. **Why I removed the "Independent brand" checkpoint.** Real data broke it: some products list
+    the parent company itself as the brand ("Colgate-Palmolive", "Haleon", "Unilever"), so they
+    have no parent and passed as independent, and every product's top swaps included one. The
+    deeper problem was the question itself: being big or owned by someone isn't wrongdoing.
+    Checkpoints now judge conduct backed by records (does it work, what's in it, how the company
+    treats workers), and ownership is shown as information and used to find the parent
+    company's records. Hiding same-owner swaps is still available, as an opt-in filter.

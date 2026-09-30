@@ -214,7 +214,7 @@ class Service:
             }
             reasons = gate(ev["results"], prefs)
             if (
-                not prefs.allow_same_owner
+                prefs.hide_same_owner
                 and base_owner
                 and own.known
                 and own.ultimate.key == base_owner

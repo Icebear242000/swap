@@ -1,7 +1,9 @@
 "use strict";
 
 // ---------- preferences (kept in this browser) ----------
-const PREFS_KEY = "swap.prefs.v1";
+// v2: the "Independent brand" checkpoint was removed and the same-owner filter flipped
+// to opt-in, so settings saved under v1 no longer mean the same thing.
+const PREFS_KEY = "swap.prefs.v2";
 let DEFS = null; // checkpoint definitions from the API
 
 function loadPrefs() {
@@ -11,7 +13,7 @@ function savePrefs(p) {
   try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch { /* private mode */ }
 }
 function defaultPrefs() {
-  const p = { required: [], importance: {}, sameOwner: false };
+  const p = { required: [], importance: {}, hideSameOwner: false };
   for (const c of DEFS.checkpoints) {
     if (c.default_required) p.required.push(c.id);
     p.importance[c.id] = c.default_importance;
@@ -24,7 +26,7 @@ function prefQuery() {
   const q = new URLSearchParams({
     required: p.required.join(","),
     importance: Object.entries(p.importance).map(([k, v]) => `${k}:${v}`).join(","),
-    same_owner: p.sameOwner ? "true" : "false",
+    hide_same_owner: p.hideSameOwner ? "true" : "false",
   });
   return q.toString();
 }
@@ -321,8 +323,8 @@ function checkpointsView() {
           </div>
         </div>`).join("")}
       <div class="cp">
-        <label class="switch"><input type="checkbox" name="same-owner" ${p.sameOwner ? "checked" : ""}>
-          Show swaps owned by the same parent company as my product</label>
+        <label class="switch"><input type="checkbox" name="hide-same-owner" ${p.hideSameOwner ? "checked" : ""}>
+          Hide swaps made by the same parent company as my product</label>
       </div>
       <p class="small muted" id="saved" role="status"></p>
       <button type="button" class="btn ghost" id="reset">Reset to defaults</button>
@@ -330,7 +332,7 @@ function checkpointsView() {
   `);
   const form = document.getElementById("cp-form");
   form.onchange = () => {
-    const next = { required: [], importance: {}, sameOwner: form["same-owner"].checked };
+    const next = { required: [], importance: {}, hideSameOwner: form["hide-same-owner"].checked };
     for (const c of DEFS.checkpoints) {
       if (form[`req-${c.id}`].checked) next.required.push(c.id);
       next.importance[c.id] = form[`imp-${c.id}`].value;

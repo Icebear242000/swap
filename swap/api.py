@@ -48,8 +48,8 @@ def create_app(settings: Settings | None = None, client: httpx.Client | None = N
     def svc() -> Service:
         return state["svc"]
 
-    def prefs(required: str | None, importance: str | None, same_owner: bool) -> Prefs:
-        return Prefs.parse(required, importance, same_owner)
+    def prefs(required: str | None, importance: str | None, hide_same_owner: bool) -> Prefs:
+        return Prefs.parse(required, importance, hide_same_owner)
 
     @app.get("/api/health")
     def health():
@@ -96,10 +96,10 @@ def create_app(settings: Settings | None = None, client: httpx.Client | None = N
         barcode: str,
         required: str | None = None,
         importance: str | None = None,
-        same_owner: bool = False,
+        hide_same_owner: bool = False,
     ):
         with lock:
-            rep = svc().report(_barcode(barcode), prefs(required, importance, same_owner))
+            rep = svc().report(_barcode(barcode), prefs(required, importance, hide_same_owner))
         if not rep:
             raise HTTPException(
                 404, "We don't have this product yet, and Open Beauty Facts doesn't list it either."
@@ -111,10 +111,12 @@ def create_app(settings: Settings | None = None, client: httpx.Client | None = N
         barcode: str,
         required: str | None = None,
         importance: str | None = None,
-        same_owner: bool = False,
+        hide_same_owner: bool = False,
     ):
         with lock:
-            alts = svc().alternatives(_barcode(barcode), prefs(required, importance, same_owner))
+            alts = svc().alternatives(
+                _barcode(barcode), prefs(required, importance, hide_same_owner)
+            )
         if alts is None:
             raise HTTPException(404, "Product not found.")
         return alts

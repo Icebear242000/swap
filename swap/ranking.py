@@ -18,14 +18,15 @@ class Prefs:
         default_factory=lambda: {
             "fights_cavities": "high",
             "ingredients": "high",
-            "independent": "medium",
             "workers": "medium",
         }
     )
-    allow_same_owner: bool = False
+    # Opt-in: being owned by the same company isn't a failing, but some people want to
+    # move their money away from a particular company.
+    hide_same_owner: bool = False
 
     @classmethod
-    def parse(cls, required: str | None, importance: str | None, same_owner: bool) -> Prefs:
+    def parse(cls, required: str | None, importance: str | None, hide_same_owner: bool) -> Prefs:
         p = cls()
         if required is not None:
             p.required = {r for r in required.split(",") if r in BY_ID}
@@ -34,7 +35,7 @@ class Prefs:
                 cid, _, level = pair.partition(":")
                 if cid in BY_ID and level in IMPORTANCE:
                     p.importance[cid] = level
-        p.allow_same_owner = same_owner
+        p.hide_same_owner = hide_same_owner
         return p
 
 
