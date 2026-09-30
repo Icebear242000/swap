@@ -97,6 +97,22 @@ def check_fights_cavities(f: ing.IngredientFindings) -> Result:
             UNKNOWN,
             "No fluoride. Contains hydroxyapatite, where the evidence is still limited.",
         )
+    # Volunteer ingredient lists are often partial or wrong, so an absent fluoride is only
+    # a fail when nothing suggests the list is incomplete.
+    if f.partial_label:
+        return _result(
+            cid,
+            UNKNOWN,
+            "No fluoride listed, but the ingredient list looks incomplete "
+            "(only part of the label was captured).",
+        )
+    if f.claims_cavity_protection:
+        return _result(
+            cid,
+            UNKNOWN,
+            "The product claims cavity protection, but no fluoride is in the listed "
+            "ingredients. The list may be incomplete or wrong.",
+        )
     return _result(cid, FAIL, "No fluoride in the ingredient list.")
 
 
@@ -225,7 +241,7 @@ def evaluate(
     s: Settings,
     rules: list[ing.RestrictedRule] | None = None,
 ) -> list[Result]:
-    findings = ing.analyze(product["ingredients_text"], rules)
+    findings = ing.analyze(product["ingredients_text"], rules, name=product["name"])
     out = []
     for c in applicable(product["category"]):
         if c.id == "fights_cavities":

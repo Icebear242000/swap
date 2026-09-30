@@ -18,6 +18,13 @@ FLUORIDE_TERMS = (
 )
 HYDROXYAPATITE_TERMS = ("hydroxyapatite", "hydroxylapatite")
 
+# A cavity-protection claim on the name or label: "anticavity", "Maximum Cavity Protection",
+# "anti-caries", "Karies". The stem "cavit" also survives OCR that drops letters ("nticavity").
+CAVITY_CLAIM = re.compile(r"cavit|caries|karies", re.IGNORECASE)
+# Signs the text is only part of a US Drug Facts label, typically the inactive-ingredients
+# panel: "Drug Facts (continued)", including OCR typos like "(cotinued)".
+CONTINUED_PANEL = re.compile(r"\(co\w{0,3}nued\)", re.IGNORECASE)
+
 # PFAS show up in personal care as fluoropolymers (PTFE) and per/polyfluoro compounds.
 # Fluoride salts are not PFAS, so the pattern must never match "sodium fluoride".
 PFAS_PATTERN = re.compile(
@@ -73,9 +80,21 @@ class IngredientFindings:
     hydroxyapatite: list[str]
     pfas: list[str]
     restricted: list[tuple[RestrictedRule, str]]
+    claims_cavity_protection: bool = False
+    partial_label: bool = False
 
 
-def analyze(text: str | None, rules: list[RestrictedRule] | None = None) -> IngredientFindings:
+def _looks_partial(text: str) -> bool:
+    t = text.lower()
+    lists_only_inactive = "inactive ingredient" in t and not re.search(
+        r"(?<!in)active ingredient", t
+    )
+    return bool(CONTINUED_PANEL.search(t)) or lists_only_inactive
+
+
+def analyze(
+    text: str | None, rules: list[RestrictedRule] | None = None, *, name: str | None = None
+) -> IngredientFindings:
     items = split_ingredients(text)
     rules = rules if rules is not None else load_restricted_rules()
     fluoride = [i for i in items if any(t in i for t in FLUORIDE_TERMS)]
@@ -86,4 +105,12 @@ def analyze(text: str | None, rules: list[RestrictedRule] | None = None) -> Ingr
         for rule in rules:
             if any(re.search(rf"\b{re.escape(a)}\b", item) for a in rule.aliases):
                 restricted.append((rule, item))
-    return IngredientFindings(bool(items), fluoride, hydroxy, pfas, restricted)
+    return IngredientFindings(
+        bool(items),
+        fluoride,
+        hydroxy,
+        pfas,
+        restricted,
+        claims_cavity_protection=bool(CAVITY_CLAIM.search(f"{name or ''} {text or ''}")),
+        partial_label=_looks_partial(text or ""),
+    )
