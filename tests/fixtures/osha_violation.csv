@@ -1,0 +1,5 @@
+activity_nr,citation_id,viol_type,current_penalty,delete_flag
+555,01001,S,"15,625",
+555,02001,R,40000,
+555,03001,W,90000,X
+556,01001,W,1000,

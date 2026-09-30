@@ -1,0 +1,4 @@
+case_id,trade_nm,legal_name,st_cd,case_violtn_cnt,bw_atp_amt,cmp_assd,findings_end_date
+1001,Colgate Palmolive,COLGATE-PALMOLIVE CO,NJ,4,"25,000.00",0,2025-03-31
+1002,Joe's Diner,Joe's Diner LLC,VA,2,500,0,2025-01-01
+1003,Colgate Palmolive,COLGATE PALMOLIVE COMPANY INC,OH,1,100,0,2012-01-01

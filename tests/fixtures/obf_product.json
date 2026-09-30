@@ -1,0 +1,12 @@
+{
+  "status": 1,
+  "product": {
+    "code": "0123456789012",
+    "product_name": "Fixture Cavity Toothpaste",
+    "brands": "Colgate,Colgate-Palmolive",
+    "categories_tags": ["en:hygiene", "en:oral-care", "en:toothpastes"],
+    "ingredients_text": "Active ingredient: Sodium monofluorophosphate 0.76%. Inactive ingredients: dicalcium phosphate dihydrate, water, glycerin, sodium lauryl sulfate, cellulose gum, flavor",
+    "quantity": "6 oz (170 g)",
+    "image_front_url": "https://images.openbeautyfacts.org/fixture.jpg"
+  }
+}

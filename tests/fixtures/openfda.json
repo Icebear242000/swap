@@ -1,0 +1,8 @@
+{"results": [
+  {"recall_number": "D-0001-2026", "recalling_firm": "Colgate-Palmolive Company",
+   "product_description": "Fixture toothpaste 4 oz", "reason_for_recall": "Test reason",
+   "classification": "Class II", "recall_initiation_date": "20260115", "status": "Ongoing"},
+  {"recall_number": "D-0002-2026", "recalling_firm": "Unrelated Pharma Inc",
+   "product_description": "Something else", "reason_for_recall": "x",
+   "classification": "Class III", "recall_initiation_date": "20260201", "status": "Ongoing"}
+]}

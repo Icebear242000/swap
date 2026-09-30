@@ -1,0 +1,5 @@
+{"items": [
+  {"price": 4.20, "currency": "USD", "date": "2026-09-10", "location": {"osm_name": "Store A"}},
+  {"price": 3.60, "currency": "USD", "date": "2026-08-01", "location": {"osm_name": "Store B"}},
+  {"price": 3.00, "currency": "EUR", "date": "2026-07-01", "location": {}}
+]}
