@@ -4,16 +4,15 @@ swap seed-demo
 swap load-products --pages 5
 swap load-ownership
 swap load-recalls
-swap load-whd path/to/whd_whisard.csv
+swap load-whd raw/whd/*.csv
 swap load-osha path/to/osha_inspection.csv path/to/osha_violation.csv
-swap check-columns whd path/to/whd_whisard.csv
+swap check-columns whd raw/whd/<chunk>.csv
 swap serve
 """
 
 from __future__ import annotations
 
 import argparse
-import csv
 import logging
 import sys
 from pathlib import Path
@@ -36,8 +35,8 @@ def main(argv: list[str] | None = None) -> int:
     lp.add_argument("--pages", type=int, default=5)
     sub.add_parser("load-ownership", help="resolve brand owners on Wikidata")
     sub.add_parser("load-recalls", help="pull recalls from openFDA for tracked companies")
-    w = sub.add_parser("load-whd", help="load a Wage and Hour Division CSV")
-    w.add_argument("csv", type=Path)
+    w = sub.add_parser("load-whd", help="load Wage and Hour Division CSVs (all chunks at once)")
+    w.add_argument("csv", type=Path, nargs="+")
     o = sub.add_parser("load-osha", help="load OSHA inspection + violation CSVs")
     o.add_argument("inspections", type=Path)
     o.add_argument("violations", type=Path)
@@ -109,8 +108,7 @@ def check_columns(kind: str, path: Path) -> int:
         "osha-inspection": dol.OSHA_INSPECTION_COLUMNS,
         "osha-violation": dol.OSHA_VIOLATION_COLUMNS,
     }[kind]
-    with path.open(encoding="utf-8", errors="replace", newline="") as f:
-        header = set(next(csv.reader(f)))
+    header = set(dol.read_header(path))
     missing = {k: v for k, v in expected.items() if v not in header}
     if missing:
         print("Missing columns (edit swap/sources/dol.py):")

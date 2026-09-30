@@ -55,8 +55,13 @@ def save_labor_cases(conn: sqlite3.Connection, rows: Iterable[tuple[dict[str, An
     return n
 
 
-def load_whd(conn: sqlite3.Connection, path: Path) -> int:
-    n = save_labor_cases(conn, dol.read_whd(path, dol.Matcher(org_keys(conn))))
+def load_whd(conn: sqlite3.Connection, paths: list[Path]) -> int:
+    """Load every chunk of the WHD download, then mark the dataset loaded once.
+
+    Marking it per chunk would let a partial load claim "no cases" for a company.
+    """
+    matcher = dol.Matcher(org_keys(conn))
+    n = sum(save_labor_cases(conn, dol.read_whd(path, matcher)) for path in paths)
     mark_dataset(conn, "whd", n, dol.WHD_SOURCE_URL)
     conn.commit()
     return n

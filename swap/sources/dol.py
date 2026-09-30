@@ -3,9 +3,9 @@
 - Wage and Hour Division (WHD) compliance actions: back wages owed to workers.
 - OSHA inspections and violations: workplace safety citations.
 
-Download from https://enforcedata.dol.gov/views/data_summary.php. The files are
-large (OSHA runs to gigabytes), so we stream them and keep only rows whose
-employer name matches a company or brand we already track.
+Download from https://data.dol.gov (WHD: dataset 10362, a zip of CSV chunks). The
+files are large (OSHA runs to gigabytes), so we stream them and keep only rows
+whose employer name matches a company or brand we already track.
 
 Column names below follow DOL's published data dictionaries. If DOL renames a
 column, change it here in one place.
@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from swap.names import Match, best_match
+from swap.util import parse_date
 
 WHD_COLUMNS = {
     "id": "case_id",
@@ -47,7 +48,7 @@ OSHA_VIOLATION_COLUMNS = {
 OSHA_SEVERITY = {"W": "willful", "R": "repeat", "S": "serious", "O": "other"}
 SEVERITY_RANK = {"willful": 3, "repeat": 2, "serious": 1, "other": 0}
 
-WHD_SOURCE_URL = "https://enforcedata.dol.gov/views/data_summary.php"
+WHD_SOURCE_URL = "https://data.dol.gov/datasets/10362"
 
 
 def osha_case_url(activity_nr: str) -> str:
@@ -74,9 +75,19 @@ class Matcher:
         return self._cache[raw]
 
 
+def read_header(path: Path) -> list[str]:
+    # DOL's field docs are lowercase but the WHD download is uppercase, so compare
+    # column names case-insensitively.
+    with path.open(encoding="utf-8", errors="replace", newline="") as f:
+        return [h.strip().lower() for h in next(csv.reader(f), [])]
+
+
 def _rows(path: Path) -> Iterator[dict[str, str]]:
     with path.open(encoding="utf-8", errors="replace", newline="") as f:
-        yield from csv.DictReader(f)
+        reader = csv.reader(f)
+        header = [h.strip().lower() for h in next(reader, [])]
+        for row in reader:
+            yield dict(zip(header, row, strict=False))
 
 
 def read_whd(path: Path, match: Matcher) -> Iterator[tuple[dict[str, Any], Match]]:
@@ -87,13 +98,15 @@ def read_whd(path: Path, match: Matcher) -> Iterator[tuple[dict[str, Any], Match
         if not hit:
             continue
         raw = next(n for n in names if n)
+        end = row.get(c["end_date"])
+        day = parse_date(end)  # the download has "2021-08-23 00:00:00+00:00"
         yield (
             {
                 "id": f"WHD:{row.get(c['id'])}",
                 "source": "WHD",
                 "raw_name": raw,
                 "state": row.get(c["state"]),
-                "date": row.get(c["end_date"]),
+                "date": day.isoformat() if day else end,
                 "violations": int(_num(row.get(c["violations"]))),
                 "back_wages": _num(row.get(c["back_wages"])),
                 "penalty": _num(row.get(c["penalty"])),
