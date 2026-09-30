@@ -14,6 +14,10 @@ verdict links to the record behind it, and missing data shows as "unknown", neve
 |---|---|---|
 | ![](docs/product.png) | ![](docs/swaps.png) | ![](docs/checkpoints.png) |
 
+*Real data: Crest 3D White from Open Beauty Facts. Its label scan is incomplete, so fluoride
+shows as unknown rather than a fail; the worker check uses Procter & Gamble's Wage and Hour
+records.*
+
 ## Checkpoints
 
 | Checkpoint | Question | Evidence |
