@@ -69,7 +69,17 @@ def load_from_wikidata(
     frontier: list[str] = []
     for i in range(0, len(brand_names), batch):
         chunk = brand_names[i : i + batch]
-        for entity in wikidata.lookup_labels(client, chunk):
+        entities = wikidata.lookup_labels(client, chunk)
+        ids_by_key: dict[str, set[str]] = {}
+        for entity in entities:
+            ids_by_key.setdefault(normalize(entity["label"] or entity["name"]), set()).add(
+                entity["id"]
+            )
+        for entity in entities:
+            # Several different items share this name (e.g. "Signal" is a record label and
+            # a toothpaste). Picking one is a guess, and a wrong owner is worse than none.
+            if len(ids_by_key[normalize(entity["label"] or entity["name"])]) > 1:
+                continue
             child = upsert_org(
                 conn, entity["label"] or entity["name"], "brand", "wikidata", entity["id"]
             )

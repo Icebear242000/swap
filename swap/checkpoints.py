@@ -128,6 +128,14 @@ def check_independent(own: Ownership) -> Result:
             for a, b in zip(own.chain, own.chain[1:], strict=False)
         ]
         return _result(cid, FAIL, f"Owned by {top.name}.", ev)
+    if own.chain[0].source == "wikidata":
+        # Wikidata is volunteer-edited; a missing "owned by" usually means nobody added it.
+        return _result(
+            cid,
+            UNKNOWN,
+            "No parent company listed on Wikidata, which doesn't confirm it's independent.",
+            [Evidence(f"{own.chain[0].name} has no owner listed.", "wikidata")],
+        )
     return _result(
         cid,
         PASS,

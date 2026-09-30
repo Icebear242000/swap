@@ -1,0 +1,191 @@
+{
+  "head": {
+    "vars": [
+      "label",
+      "item",
+      "itemLabel",
+      "parent",
+      "parentLabel"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q2285060"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q3483577"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q16701586"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      },
+      {
+        "label": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        },
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q16701586"
+        },
+        "itemLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Signal"
+        }
+      }
+    ]
+  }
+}
