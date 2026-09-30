@@ -54,6 +54,15 @@ def test_loaded_dataset_with_no_records_passes(conn):
     assert r.status == PASS and "No cases" in r.summary
 
 
+def test_brand_with_no_known_company_is_unknown(conn):
+    # Records match companies only, so for a brand with no company in its chain "no cases"
+    # would be true by construction. That's not evidence, so it's unknown.
+    records.load_whd(conn, [FIX / "whd.csv"])
+    ownership.upsert_org(conn, "Tiny Paste", "brand", "wikidata", "Q1")
+    r = check_workers(conn, ownership.chain_for(conn, "tiny paste"), S)
+    assert r.status == UNKNOWN and "company" in r.summary
+
+
 def test_recalls_match_tracked_firms_only(conn, client):
     n = records.load_recalls(conn, client)
     assert conn.execute("SELECT COUNT(*) FROM recalls").fetchone()[0] == 1

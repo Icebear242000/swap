@@ -175,7 +175,8 @@ def seed(conn: sqlite3.Connection) -> int:
             (barcode, price, "USD", "2026-09-01", "Sample store", "demo"),
         )
     for brand, parent in OWNERSHIP:
-        child = upsert_org(conn, brand, "brand", "demo")
+        # A sample brand with no parent is a small company that makes its own product.
+        child = upsert_org(conn, brand, "brand" if parent else "company", "demo")
         if parent:
             add_parent(conn, child, upsert_org(conn, parent, "company", "demo"), "demo", None)
     for cid, raw, org, source, date, viol, wages, penalty, sev, state in LABOR:

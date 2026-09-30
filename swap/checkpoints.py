@@ -124,6 +124,15 @@ def check_workers(conn: sqlite3.Connection, own: Ownership, s: Settings) -> Resu
     coverage = {"whd", "osha"} & loaded.keys() or (demo_org and "demo_labor" in loaded)
     if not own.known:
         return _result(cid, UNKNOWN, "We can't tell who makes this, so we can't check records.")
+    if not any(link.kind == "company" for link in own.chain):
+        # Records are matched to companies only, so "no cases" here would be true by
+        # construction, not evidence.
+        return _result(
+            cid,
+            UNKNOWN,
+            f"We know the brand {own.chain[0].name}, but not the company behind it, "
+            "so we can't check its records.",
+        )
     if not coverage:
         return _result(
             cid, UNKNOWN, "Labor records (OSHA, Wage and Hour Division) aren't loaded yet."
