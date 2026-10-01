@@ -83,6 +83,20 @@ CREATE TABLE IF NOT EXISTS labor_cases (
 );
 CREATE INDEX IF NOT EXISTS idx_labor_name ON labor_cases(name_norm);
 
+-- Concluded federal EPA enforcement cases (ICIS FE&C), Superfund excluded.
+CREATE TABLE IF NOT EXISTS env_cases (
+    id         TEXT PRIMARY KEY,           -- 'EPA:<case_number>'
+    raw_name   TEXT NOT NULL,              -- defendant name as filed
+    name_norm  TEXT NOT NULL,
+    case_name  TEXT,
+    law        TEXT,                       -- primary law(s), e.g. 'TSCA', 'CAA,CWA'
+    date       TEXT,                       -- latest settlement date, YYYY-MM-DD
+    penalty    REAL,                       -- federal penalty for the whole case
+    summary    TEXT,
+    url        TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_env_name ON env_cases(name_norm);
+
 CREATE TABLE IF NOT EXISTS recalls (
     recall_number  TEXT PRIMARY KEY,
     firm           TEXT NOT NULL,

@@ -32,6 +32,10 @@ class Settings:
     labor_lookback_years: int = 5
     whd_back_wages_fail_usd: float = 10_000.0
 
+    # Environmental record: concluded federal EPA cases (Superfund excluded).
+    env_lookback_years: int = 5
+    env_penalty_fail_usd: float = 100_000.0
+
     recall_lookback_years: int = 3
 
 

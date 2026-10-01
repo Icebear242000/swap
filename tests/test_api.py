@@ -20,7 +20,12 @@ def test_demo_product_report(settings, client):
     with make(settings, client) as t:
         r = t.get("/api/products/2000000000060").json()  # Brightmore
         status = {c["id"]: c["status"] for c in r["checkpoints"]}
-        assert status == {"fights_cavities": "pass", "ingredients": "pass", "workers": "fail"}
+        assert status == {
+            "fights_cavities": "pass",
+            "ingredients": "pass",
+            "workers": "fail",
+            "environment": "unknown",  # the sample data has no EPA records
+        }
         # Ownership is still shown, as information rather than a checkpoint.
         assert r["ownership"]["siblings"] == ["Lumen"]
         assert r["price"]["per_oz"] == round(2.99 / 6.0, 2)
@@ -29,7 +34,7 @@ def test_demo_product_report(settings, client):
 def test_checkpoints_judge_conduct_not_ownership(settings, client):
     with make(settings, client) as t:
         ids = [c["id"] for c in t.get("/api/checkpoints").json()["checkpoints"]]
-        assert ids == ["fights_cavities", "ingredients", "workers"]
+        assert ids == ["fights_cavities", "ingredients", "workers", "environment"]
 
 
 def test_recall_banner(settings, client):

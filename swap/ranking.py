@@ -19,6 +19,7 @@ class Prefs:
             "fights_cavities": "high",
             "ingredients": "high",
             "workers": "medium",
+            "environment": "medium",
         }
     )
     # Opt-in: being owned by the same company isn't a failing, but some people want to

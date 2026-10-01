@@ -11,7 +11,7 @@ import httpx
 
 from swap.db import mark_dataset
 from swap.names import Match, normalize
-from swap.sources import dol, openfda
+from swap.sources import dol, epa, openfda
 
 
 def org_keys(conn: sqlite3.Connection) -> list[str]:
@@ -78,6 +78,32 @@ def load_osha(conn: sqlite3.Connection, inspections: Path, violations: Path) -> 
     return n
 
 
+def load_epa(conn: sqlite3.Connection, folder: Path) -> int:
+    """Load EPA federal enforcement cases from the unzipped ICIS FE&C download."""
+    n = 0
+    for case, match in epa.read_epa(folder, dol.Matcher(org_keys(conn))):
+        name_norm = save_alias(conn, case["raw_name"], match)
+        conn.execute(
+            "INSERT OR REPLACE INTO env_cases(id, raw_name, name_norm, case_name, law, date, "
+            "penalty, summary, url) VALUES (?,?,?,?,?,?,?,?,?)",
+            (
+                case["id"],
+                case["raw_name"],
+                name_norm,
+                case["case_name"],
+                case["law"],
+                case["date"],
+                case["penalty"],
+                case["summary"],
+                case["url"],
+            ),
+        )
+        n += 1
+    mark_dataset(conn, "epa", n, epa.SOURCE_URL)
+    conn.commit()
+    return n
+
+
 def save_recalls(conn: sqlite3.Connection, recalls: Iterable[dict[str, Any]], matcher) -> int:
     n = 0
     for r in recalls:
@@ -128,6 +154,16 @@ def labor_for(conn: sqlite3.Connection, keys: list[str]) -> list[sqlite3.Row]:
     return conn.execute(
         "SELECT l.*, a.org_key FROM labor_cases l JOIN aliases a ON a.name_norm = l.name_norm "
         f"WHERE a.org_key IN ({_placeholders(keys)}) ORDER BY l.date DESC",
+        keys,
+    ).fetchall()
+
+
+def env_for(conn: sqlite3.Connection, keys: list[str]) -> list[sqlite3.Row]:
+    if not keys:
+        return []
+    return conn.execute(
+        "SELECT e.*, a.org_key FROM env_cases e JOIN aliases a ON a.name_norm = e.name_norm "
+        f"WHERE a.org_key IN ({_placeholders(keys)}) ORDER BY e.date DESC",
         keys,
     ).fetchall()
 

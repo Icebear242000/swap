@@ -17,9 +17,10 @@ Know these well enough to explain without notes.
 6. **Resilience.** Every outside call has a timeout and retries and degrades to "unknown".
 7. **What I'd do next.** More categories; OCR of ingredient labels for products missing from
    Open Beauty Facts; a scheduled job to refresh records; Postgres if multiple writers appear;
-   run the OSHA loader on the real multi-GB files; a reviewed list of manual aliases; an
-   environment checkpoint from EPA enforcement records; supply-chain forced labor from official
-   lists (UFLPA Entity List, CBP Withhold Release Orders).
+   run the OSHA loader on the real multi-GB files; a reviewed list of manual aliases;
+   supply-chain forced labor from official lists (UFLPA Entity List, CBP Withhold Release
+   Orders); state environmental enforcement and climate data; judging only companies with a
+   known US presence on US-only records.
 
 ## What testing against real data found
 
@@ -56,3 +57,12 @@ response (fixtures ending in `_real`), written so it failed before the fix.
     Checkpoints now judge conduct backed by records (does it work, what's in it, how the company
     treats workers), and ownership is shown as information and used to find the parent
     company's records. Hiding same-owner swaps is still available, as an opt-in filter.
+14. **Designing the environmental record from what the data actually says.** I looked at EPA's
+    real cases for the tracked companies before writing rules. Most were Superfund cleanup
+    cases naming 100 to 400 companies each; liability there doesn't depend on wrongdoing, so I
+    excluded them. The recent cases were chemical reporting and pesticide labeling, not
+    pollution: Colgate-Palmolive paid $930,000 in 2026 for failing to report 47 chemicals. So
+    the checkpoint is named "Environmental record" and described as federal compliance, not
+    climate impact, which the data can't show. Fail is $100,000+ in penalties in 5 years
+    (config), only concluded cases count, and a quirk mattered: the case file's penalty column
+    is blank on recent cases, so amounts come from a separate penalties file.

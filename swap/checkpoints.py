@@ -18,7 +18,7 @@ from swap.config import Settings
 from swap.db import loaded_datasets
 from swap.names import normalize
 from swap.ownership import Ownership
-from swap.records import labor_for, recalls_for
+from swap.records import env_for, labor_for, recalls_for
 from swap.util import parse_date, years_ago
 
 PASS, FAIL, UNKNOWN = "pass", "fail", "unknown"
@@ -41,6 +41,12 @@ CHECKPOINTS: tuple[CheckpointDef, ...] = (
         "workers",
         "Treats workers well",
         "No serious labor violations in recent public records?",
+        None,
+    ),
+    CheckpointDef(
+        "environment",
+        "Environmental record",
+        "No significant federal environmental enforcement in the last 5 years?",
         None,
     ),
 )
@@ -189,6 +195,58 @@ def check_workers(conn: sqlite3.Connection, own: Ownership, s: Settings) -> Resu
     )
 
 
+def check_environment(conn: sqlite3.Connection, own: Ownership, s: Settings) -> Result:
+    cid = "environment"
+    if not own.known:
+        return _result(cid, UNKNOWN, "We can't tell who makes this, so we can't check records.")
+    if not any(link.kind == "company" for link in own.chain):
+        return _result(
+            cid,
+            UNKNOWN,
+            f"We know the brand {own.chain[0].name}, but not the company behind it, "
+            "so we can't check its records.",
+        )
+    if "epa" not in loaded_datasets(conn):
+        return _result(cid, UNKNOWN, "EPA enforcement records aren't loaded yet.")
+    since = years_ago(s.env_lookback_years)
+    keys = [link.key for link in own.chain]
+    cases = [c for c in env_for(conn, keys) if (d := parse_date(c["date"])) and d >= since]
+    ev = [_env_evidence(c) for c in cases[:12]]
+    who = own.chain[-1].name
+    years = s.env_lookback_years
+    big = [c for c in cases if (c["penalty"] or 0) >= s.env_penalty_fail_usd]
+    if big:
+        total = sum(c["penalty"] for c in big)
+        return _result(
+            cid,
+            FAIL,
+            f"${total:,.0f} in federal environmental penalties against {who} "
+            f"in the last {years} years.",
+            ev,
+        )
+    if cases:
+        return _result(
+            cid,
+            PASS,
+            f"{len(cases)} federal case(s) in the last {years} years, below our limit.",
+            ev,
+        )
+    return _result(
+        cid,
+        PASS,
+        f"No federal environmental cases found in the last {years} years (EPA). "
+        "US federal cases only; most routine enforcement is by states.",
+    )
+
+
+def _env_evidence(c: sqlite3.Row) -> Evidence:
+    law = f"{c['law']}, " if c["law"] else ""
+    penalty = f"${c['penalty']:,.0f} penalty" if c["penalty"] else "no penalty"
+    summary = f" {c['summary'][:160].rstrip()}" if c["summary"] else ""
+    text = f"EPA case ({c['date']}): {law}{penalty}.{summary} Filed as “{c['raw_name']}”."
+    return Evidence(text, "EPA ECHO", c["url"])
+
+
 def _labor_evidence(c: sqlite3.Row) -> Evidence:
     where = f" in {c['state']}" if c["state"] else ""
     if c["source"] == "OSHA":
@@ -250,4 +308,6 @@ def evaluate(
             out.append(check_ingredients(findings))
         elif c.id == "workers":
             out.append(check_workers(conn, own, s))
+        elif c.id == "environment":
+            out.append(check_environment(conn, own, s))
     return out
